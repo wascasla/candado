@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 /*=====[C++ - begin]=========================================================*/
 
@@ -38,7 +39,7 @@ void obtener_Estado_Candado(void);
 
 void candado_inicializar_MEF(void);
 
-void candado_Normal_MEF(uint8_t);
+void candado_Update_MEF(uint8_t);
 
 /*=====[Prototypes (declarations) of public interrupt functions]=============*/
 

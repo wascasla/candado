@@ -47,16 +47,14 @@ typedef enum {
 /*=====[Definiciones de Variables globales publicas externas]================*/
 
 /*=====[Definiciones de Variables globales publicas]=========================*/
-bool_t valor;
-// Button objects
-   button_t myButton1;
+
 
 /*=====[Definiciones de Variables globales privadas]=========================*/
 
 static BOTON_PRESIONADO_t botonPresionado;
 static CANDADO_ESTADO_t estadoCandado;
 static uint8_t nivelBateria;
-
+static uint16_t id_Dispositivo;
 
 /*=====[Prototipos de funciones privadas]====================================*/
 
@@ -77,10 +75,14 @@ void desbloquear_Candado(void){
 void recargar_Bateria(void){
 	//si el nivel de bateria es menor a 100 entonces suma en 5 el nivel de la misma cada vez que se aprieta el pulsador
 	if (nivelBateria < 100){
+		//encender lus verde indicador de
 		LED_encender(LUZ_VERDE);
 		nivelBateria = nivelBateria + 5;
+		if (nivelBateria >= 100){
+			nivelBateria = 100;
+		}
+		//delay(500);
 		LED_apagar(LUZ_VERDE);
-			//mostrar el nivel de la bateria en la uart
 	}
 
 }
@@ -91,19 +93,34 @@ void descargar_bateria(void){
 	}
 }
 
-void mostrar_Estado_Candado(void){
+void mostrar_Estado_Candado(void) {
 	//consultar valor de los parametros del candado
 	//mostrar por la uart los mismos
-	char str[12];
-		sprintf(str, "%d", estadoCandado);
-		char str2[12];
-			sprintf(str2, "%d", nivelBateria);
-	uartWriteString( UART_USB, "Estado del candado:" );
-	uartWriteString( UART_USB, str );
-	uartWriteString( UART_USB, "Nivel bateria:" );
+	char estado[13];
+	char str[8];
+	sprintf(str, "%d", estadoCandado);
+	char str2[8];
+	sprintf(str2, "%d", nivelBateria);
+	char str3[8];
+	sprintf(str3, "%d", id_Dispositivo);
 
-	uartWriteString( UART_USB, str2 );
-	delay(1);
+	if (estadoCandado == ESTADO_BLOQUEADO) {
+
+		strcpy( estado, "BLOQUEADO" );
+	}
+	if (estadoCandado == ESTADO_DESBLOQUEADO) {
+		strcpy( estado, "DESBLOQUEADO" );
+	}
+
+	uartWriteString(UART_USB, "Estado del candado: ");
+	uartWriteString(UART_USB, estado);
+	uartWriteString( UART_USB, "\r\n" );
+	uartWriteString(UART_USB, "Nivel bateria: ");
+	uartWriteString(UART_USB, str2);
+	uartWriteString( UART_USB, "\r\n" );
+	uartWriteString(UART_USB, "ID dispositivo: ");
+	uartWriteString(UART_USB, str3);
+	uartWriteString( UART_USB, "\r\n" );
 }
 
 void candado_inicializar_MEF(void){
@@ -115,10 +132,11 @@ void candado_inicializar_MEF(void){
 	LED_apagar(LUZ_AMARILLA);
 
 	uartConfig( UART_USB, 115200 );
+	id_Dispositivo = 14274; //ID dispositivo
 
 }
 
-void candado_Normal_MEF(uint8_t teclaPresionada) {
+void candado_Update_MEF(uint8_t teclaPresionada) {
 
 	switch (teclaPresionada) {
 
@@ -130,6 +148,7 @@ void candado_Normal_MEF(uint8_t teclaPresionada) {
 			desbloquear_Candado();
 			descargar_bateria();
 			uartWriteString( UART_USB, "Candado desbloqueado" );
+			uartWriteString( UART_USB, "\r\n" );
 			//exit();
 		}
 
@@ -142,6 +161,7 @@ void candado_Normal_MEF(uint8_t teclaPresionada) {
 			bloquear_Candado();
 			descargar_bateria();
 			uartWriteString( UART_USB, "Candado bloqueado" );
+			uartWriteString( UART_USB, "\r\n" );
 
 		}
 
@@ -163,12 +183,19 @@ void candado_Normal_MEF(uint8_t teclaPresionada) {
 		break;
 
 	case 4: //tecla 4 consultar estado
-		descargar_bateria();
+
 		mostrar_Estado_Candado();
 
+		break;
+
+	default:
+		candado_inicializar_MEF();
+		break;
 
 	}
 
 }
+
+
 
 

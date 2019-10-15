@@ -30,28 +30,28 @@ int main( void )
    // ----- Repeat for ever -------------------------
    while( true ) {
 
+	   //dependiendo de que boton del controlador presiono
+	   	valor = !gpioRead(TEC1); //boton1  desbloquear candado
+	   	if (valor == 1) {
+	   		candado_Update_MEF(1);
+	   	}
+	   	valor = !gpioRead(TEC2); //boton2 bloquear candado
+	   	if (valor == 1) {
 
-	   valor = !gpioRead(TEC1);
-		if (valor == 1) {
-			candado_Normal_MEF(1);
-		}
-		valor = !gpioRead(TEC2);
-		if (valor == 1) {
+	   		candado_Update_MEF(2);
+	   	}
+	   	valor = !gpioRead(TEC3); // boton3
 
-			candado_Normal_MEF(2);
-		}
-		valor = !gpioRead(TEC3);
+	   	if (valor == 1) {
 
-		if (valor == 1) {
+	   		candado_Update_MEF(3);
+	   	}
+	   	valor = !gpioRead(TEC4);// boton 4 consultar estado del candado
 
-			candado_Normal_MEF(3);
-		}
-		valor = !gpioRead(TEC4);
+	   	if (valor == 1) {
 
-		if (valor == 1) {
-
-			candado_Normal_MEF(4);
-		}
+	   		candado_Update_MEF(4);
+	   	}
 
    }
 
